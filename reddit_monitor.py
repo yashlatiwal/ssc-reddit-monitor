@@ -4,8 +4,8 @@ import os
 import time
 
 # --- 1. YOUR TARGETS ---
-# Combined subreddits (Duplicates removed)
-SUBREDDITS = "ssc+SSCCGL+SSC_CGL_Beginners+SSCexamsIndia+SSCEnglish" 
+# Separated into a list to prevent Reddit's RSS from crashing
+SUBREDDITS = ["ssc", "SSCCGL", "SSC_CGL_Beginners", "SSCexamsIndia", "SSCEnglish"] 
 
 # Comprehensive keyword list for SSC English With Yash
 KEYWORDS = [
@@ -77,58 +77,57 @@ def send_telegram_message(text):
         print(f"Error sending Telegram message: {e}")
 
 def main():
-    # Reddit RSS URL for combined subreddits sorted by new
-    rss_url = f"https://www.reddit.com/r/{SUBREDDITS}/new.rss"
+    # Calculate time 24 hours ago (TEMPORARY FOR TESTING)
+    time_limit = time.time() - (24 * 60 * 60)
     
-    # We must use a standard web browser header, or Reddit will block the RSS request
+    # We must use a standard web browser header
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
     
-    print(f"Fetching RSS feed: {rss_url}")
-    try:
-        response = requests.get(rss_url, headers=headers)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching RSS feed: {e}")
-        return
-
-    feed = feedparser.parse(response.content)
-    
-    # Calculate time 65 minutes ago
-    time_limit = time.time() - (65 * 60)
-    
-    for entry in feed.entries:
-        # Convert RSS publication time to standard timestamp
-        try:
-            entry_time = time.mktime(entry.published_parsed)
-        except AttributeError:
-            continue # Skip if date cannot be parsed
+    # Loop through each subreddit one by one
+    for sub in SUBREDDITS:
+        rss_url = f"https://www.reddit.com/r/{sub}/new.rss"
+        print(f"Fetching RSS feed: {rss_url}")
         
-        # Check 1: Is the post from the last hour?
-        if entry_time > time_limit:
-            
-            # Combine title and body text, convert to lowercase for matching
-            title = entry.title if hasattr(entry, 'title') else ""
-            summary = entry.summary if hasattr(entry, 'summary') else ""
-            full_text = (title + " " + summary).lower()
-            
-            # Check 2: Are any of our keywords in the text?
-            matched_keywords = [kw for kw in KEYWORDS if kw in full_text]
-            
-            if matched_keywords:
-                # Get the specific subreddit name
-                sub_name = entry.tags[0].term if hasattr(entry, 'tags') and len(entry.tags) > 0 else 'Reddit'
-                author_name = entry.author if hasattr(entry, 'author') else 'Unknown'
-                post_link = entry.link if hasattr(entry, 'link') else ''
+        try:
+            response = requests.get(rss_url, headers=headers)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching RSS feed for {sub}: {e}")
+            continue # Skip to the next subreddit if this one fails
 
-                msg = (
-                    f"🔴 <b>New Post — r/{sub_name}</b>\n"
-                    f"📌 {title}\n"
-                    f"🔑 <i>Matched: {', '.join(matched_keywords)}</i>\n"
-                    f"👤 {author_name}\n"
-                    f"🔗 {post_link}"
-                )
-                send_telegram_message(msg)
-                print(f"Alert sent for: {title}")
+        feed = feedparser.parse(response.content)
+        
+        for entry in feed.entries:
+            try:
+                entry_time = time.mktime(entry.published_parsed)
+            except AttributeError:
+                continue 
+            
+            # Check 1: Is the post from the targeted timeframe?
+            if entry_time > time_limit:
+                title = entry.title if hasattr(entry, 'title') else ""
+                summary = entry.summary if hasattr(entry, 'summary') else ""
+                full_text = (title + " " + summary).lower()
+                
+                # Check 2: Are any of our keywords in the text?
+                matched_keywords = [kw for kw in KEYWORDS if kw in full_text]
+                
+                if matched_keywords:
+                    author_name = entry.author if hasattr(entry, 'author') else 'Unknown'
+                    post_link = entry.link if hasattr(entry, 'link') else ''
+
+                    msg = (
+                        f"🔴 <b>New Post — r/{sub}</b>\n"
+                        f"📌 {title}\n"
+                        f"🔑 <i>Matched: {', '.join(matched_keywords)}</i>\n"
+                        f"👤 {author_name}\n"
+                        f"🔗 {post_link}"
+                    )
+                    send_telegram_message(msg)
+                    print(f"Alert sent for: {title}")
+        
+        # Pause for 2 seconds between subreddits so Reddit doesn't block us for spamming
+        time.sleep(2)
 
 if __name__ == "__main__":
     main()
