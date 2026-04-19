@@ -52,9 +52,9 @@ def send_telegram(bot_token, chat_id, message):
 
 def fetch_rss(subreddit, feed_type="new"):
     if feed_type == "comments":
-        url = f"https://www.reddit.com/r/{subreddit}/comments/.rss?limit=25"
+        url = f"https://www.reddit.com/r/{subreddit}/comments/.rss?limit=100"
     else:
-        url = f"https://www.reddit.com/r/{subreddit}/new/.rss?limit=25"
+        url = f"https://www.reddit.com/r/{subreddit}/new/.rss?limit=100"
     try:
         r = requests.get(url, headers=HEADERS, timeout=20)
         r.raise_for_status()
