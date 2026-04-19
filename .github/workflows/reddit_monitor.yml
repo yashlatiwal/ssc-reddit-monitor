@@ -1,27 +1,38 @@
-name: SSC English Reddit Monitor
+name: Reddit Keyword Monitor
 
 on:
   schedule:
-    - cron: '0 * * * *' # Runs at the top of every hour
-  workflow_dispatch: # Allows you to run it manually to test
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   monitor:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
-        
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-          
+          python-version: "3.11"
+
       - name: Install dependencies
-        run: pip install -r requirements.txt
-        
-      - name: Run script
+        run: pip install requests
+
+      - name: Run monitor
         env:
-          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-        run: python reddit_monitor.py
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:   ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python monitor.py
+
+      - name: Commit seen_ids.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add seen_ids.json
+          git diff --cached --quiet || git commit -m "chore: update seen_ids [skip ci]"
+          git push
