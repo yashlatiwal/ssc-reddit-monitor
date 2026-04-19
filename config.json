@@ -1,0 +1,27 @@
+{
+  "check_posts": true,
+  "check_body": true,
+  "check_comments": true,
+  "watches": [
+    {
+      "subreddit": "ssc",
+      "keywords": ["blackbook english", "pinnacle english", "neetu singh", "sp bakshi", "word power made easy", "norman lewis", "wren and martin", "ssc english notes", "vocab pdf", "best book for ssc english", "tcs vocab", "tcs english questions", "english sectional mock", "grammar notes", "common errors", "sentence improvement", "fill in the blanks", "active passive", "spotting errors", "subject verb agreement", "cloze test", "comprehension", "error spotting", "one word substitution", "idioms and phrases", "synonyms antonyms", "daily vocab", "vocab for cgl", "how to improve english", "english for beginners", "ssc english weak", "english strategy", "english score", "yash english", "ssc english with yash", "vocab", "idioms", "vocabulary", "phrasal verbs"]
+    },
+    {
+      "subreddit": "SSCCGL",
+      "keywords": ["blackbook english", "pinnacle english", "neetu singh", "sp bakshi", "word power made easy", "norman lewis", "wren and martin", "ssc english notes", "vocab pdf", "best book for ssc english", "tcs vocab", "tcs english questions", "english sectional mock", "grammar notes", "common errors", "sentence improvement", "fill in the blanks", "active passive", "spotting errors", "subject verb agreement", "cloze test", "comprehension", "error spotting", "one word substitution", "idioms and phrases", "synonyms antonyms", "daily vocab", "vocab for cgl", "how to improve english", "english for beginners", "ssc english weak", "english strategy", "english score", "yash english", "ssc english with yash", "vocab", "idioms", "vocabulary", "phrasal verbs"]
+    },
+    {
+      "subreddit": "SSC_CGL_Beginners",
+      "keywords": ["blackbook english", "pinnacle english", "neetu singh", "sp bakshi", "word power made easy", "norman lewis", "wren and martin", "ssc english notes", "vocab pdf", "best book for ssc english", "tcs vocab", "tcs english questions", "english sectional mock", "grammar notes", "common errors", "sentence improvement", "fill in the blanks", "active passive", "spotting errors", "subject verb agreement", "cloze test", "comprehension", "error spotting", "one word substitution", "idioms and phrases", "synonyms antonyms", "daily vocab", "vocab for cgl", "how to improve english", "english for beginners", "ssc english weak", "english strategy", "english score", "yash english", "ssc english with yash", "vocab", "idioms", "vocabulary", "phrasal verbs"]
+    },
+    {
+      "subreddit": "SSCexamsIndia",
+      "keywords": ["blackbook english", "pinnacle english", "neetu singh", "sp bakshi", "word power made easy", "norman lewis", "wren and martin", "ssc english notes", "vocab pdf", "best book for ssc english", "tcs vocab", "tcs english questions", "english sectional mock", "grammar notes", "common errors", "sentence improvement", "fill in the blanks", "active passive", "spotting errors", "subject verb agreement", "cloze test", "comprehension", "error spotting", "one word substitution", "idioms and phrases", "synonyms antonyms", "daily vocab", "vocab for cgl", "how to improve english", "english for beginners", "ssc english weak", "english strategy", "english score", "yash english", "ssc english with yash", "vocab", "idioms", "vocabulary", "phrasal verbs"]
+    },
+    {
+      "subreddit": "SSCEnglish",
+      "keywords": ["blackbook english", "pinnacle english", "neetu singh", "sp bakshi", "word power made easy", "norman lewis", "wren and martin", "ssc english notes", "vocab pdf", "best book for ssc english", "tcs vocab", "tcs english questions", "english sectional mock", "grammar notes", "common errors", "sentence improvement", "fill in the blanks", "active passive", "spotting errors", "subject verb agreement", "cloze test", "comprehension", "error spotting", "one word substitution", "idioms and phrases", "synonyms antonyms", "daily vocab", "vocab for cgl", "how to improve english", "english for beginners", "ssc english weak", "english strategy", "english score", "yash english", "ssc english with yash", "vocab", "idioms", "vocabulary", "phrasal verbs"]
+    }
+  ]
+}
