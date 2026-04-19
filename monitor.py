@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
 Reddit Keyword Monitor → Telegram Notifier
-Uses RSS feeds. Shows match location (title/body/comment). Word boundary matching.
+Uses RSS feeds. Shows match location. Word boundary matching. RSS limit 100.
 """
 
 import os
 import json
 import time
 import re
+import datetime
 import xml.etree.ElementTree as ET
 import requests
 
@@ -78,26 +79,12 @@ def strip_html(text):
     return re.sub(r"<[^>]+>", " ", text).strip()
 
 def matches_keyword(text, keyword):
-    """
-    Word-boundary aware matching.
-    Short keywords (1 word, <=4 chars) require word boundaries.
-    Multi-word or longer keywords use simple substring match.
-    """
+    """Lenient substring matching — catches CGL2024, #CGLprep, r/SSCCGL etc."""
     if not text:
         return False
-    text_lower = text.lower()
-    kw_lower   = keyword.lower()
-
-    words = kw_lower.split()
-    if len(words) == 1 and len(kw_lower) <= 4:
-        # strict word boundary for short single words like "ows", "vocab"
-        pattern = r'\b' + re.escape(kw_lower) + r'\b'
-        return bool(re.search(pattern, text_lower))
-    else:
-        return kw_lower in text_lower
+    return keyword.lower() in text.lower()
 
 def find_matches(text, keywords):
-    """Return list of all matched keywords."""
     found = []
     for kw in keywords:
         if matches_keyword(text, kw):
@@ -110,9 +97,9 @@ def format_post_alert(subreddit, title, link, author, matched_in_title, matched_
         f"📌 {title}",
     ]
     if matched_in_title:
-        lines.append(f"🎯 <b>Title match:</b> <code>{', '.join(matched_in_title)}</code>")
+        lines.append(f"🎯 <b>Title:</b> <code>{', '.join(matched_in_title)}</code>")
     if matched_in_body:
-        lines.append(f"📄 <b>Body match:</b> <code>{', '.join(matched_in_body)}</code>")
+        lines.append(f"📄 <b>Body:</b> <code>{', '.join(matched_in_body)}</code>")
     lines.append(f"👤 {author}")
     lines.append(f"🔗 {link}")
     return "\n".join(lines)
@@ -122,7 +109,7 @@ def format_comment_alert(subreddit, content, link, author, matched_kws):
     return (
         f"💬 <b>New Comment</b> — r/{subreddit}\n"
         f"💬 <i>{preview}...</i>\n"
-        f"🎯 <b>Comment match:</b> <code>{', '.join(matched_kws)}</code>\n"
+        f"🎯 <b>Comment:</b> <code>{', '.join(matched_kws)}</code>\n"
         f"👤 {author}\n"
         f"🔗 {link}"
     )
@@ -148,7 +135,6 @@ def main():
 
         print(f"\n▶ r/{subreddit}  |  {len(keywords)} keywords")
 
-        # ── Posts ──────────────────────────────────────────────────────────
         if check_posts or check_body:
             entries = fetch_rss(subreddit, "new")
             time.sleep(2)
@@ -160,9 +146,7 @@ def main():
 
                 matched_in_title = find_matches(title, keywords) if check_posts else []
                 matched_in_body  = find_matches(strip_html(content), keywords) if check_body else []
-
-                # Remove body matches that are already in title matches
-                matched_in_body = [k for k in matched_in_body if k not in matched_in_title]
+                matched_in_body  = [k for k in matched_in_body if k not in matched_in_title]
 
                 if matched_in_title or matched_in_body:
                     all_kws = matched_in_title + matched_in_body
@@ -174,7 +158,6 @@ def main():
 
                 seen.add(eid)
 
-        # ── Comments ───────────────────────────────────────────────────────
         if check_comments:
             entries = fetch_rss(subreddit, "comments")
             time.sleep(2)
@@ -197,6 +180,17 @@ def main():
 
     save_seen(seen)
     print(f"\n✔ Done. Alerts sent: {alerts_sent}")
+
+    if alerts_sent == 0:
+        now = datetime.datetime.utcnow().strftime("%d %b %Y %H:%M UTC")
+        msg = (
+            f"🔍 <b>Reddit Monitor</b>\n"
+            f"━━━━━━━━━━━━━━━━━━━━\n"
+            f"No keyword matches this run.\n"
+            f"🕐 {now}\n"
+            f"📡 5 subreddits checked"
+        )
+        send_telegram(bot_token, chat_id, msg)
 
 if __name__ == "__main__":
     main()
